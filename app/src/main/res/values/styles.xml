@@ -8,4 +8,14 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <!--彩票Activity，layout-->
+    <style name="CaiPiao">
+        <item name="android:textSize">36sp</item>
+        <item name="android:textColor">@color/colorWhite</item>
+        <item name="android:layout_width">75dp</item>
+        <item name="android:layout_height">75dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:background">@drawable/home_adjust_background_red</item>
+    </style>
 </resources>
