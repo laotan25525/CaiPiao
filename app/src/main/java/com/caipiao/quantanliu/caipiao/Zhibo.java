@@ -14,6 +14,7 @@ public class Zhibo {
     public ArrayList<Danmaku> currentDanmaKuList = new ArrayList<>();
 
     public ArrayList<Danmaku> zhongJiangDanmaKuList = new ArrayList<>();
+    public int shuangSeQiuPhase;
 
     private void Zhibo() {
     }

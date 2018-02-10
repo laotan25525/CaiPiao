@@ -1,5 +1,7 @@
 package com.caipiao.quantanliu.caipiao.crawler.bean;
 
+import android.support.annotation.NonNull;
+
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
@@ -12,7 +14,7 @@ import java.util.Date;
  * DouyuCrawler
  */
 @Entity
-public class Danmaku {
+public class Danmaku implements Comparable<Danmaku> {
 
     @Id
     private Long id;//数据库id
@@ -26,6 +28,31 @@ public class Danmaku {
     private Date date;//发布时间
     @Property
     private int rid;//房间号
+    @Property
+    private int winningCount;//房间号
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Danmaku danmaku = (Danmaku) o;
+
+        if (getUid() != danmaku.getUid()) return false;
+        if (getRid() != danmaku.getRid()) return false;
+        if (getWinningCount() != danmaku.getWinningCount()) return false;
+        return getContent() != null ? getContent().equals(danmaku.getContent()) : danmaku.getContent() == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getUid();
+        result = 31 * result + (getContent() != null ? getContent().hashCode() : 0);
+        result = 31 * result + getRid();
+        result = 31 * result + getWinningCount();
+        return result;
+    }
 
     public Danmaku(int uid, String snick, String content, int rid) {
         this.uid = uid;
@@ -35,15 +62,15 @@ public class Danmaku {
         this.rid = rid;
     }
 
-    @Generated(hash = 750813962)
-    public Danmaku(Long id, int uid, String snick, String content, Date date,
-            int rid) {
+    @Generated(hash = 1502957034)
+    public Danmaku(Long id, int uid, String snick, String content, Date date, int rid, int winningCount) {
         this.id = id;
         this.uid = uid;
         this.snick = snick;
         this.content = content;
         this.date = date;
         this.rid = rid;
+        this.winningCount = winningCount;
     }
 
     @Generated(hash = 712809626)
@@ -59,6 +86,14 @@ public class Danmaku {
                 ", date=" + date +
                 ", rid=" + rid +
                 '}';
+    }
+
+    public int getWinningCount() {
+        return winningCount;
+    }
+
+    public void setWinningCount(int winningCount) {
+        this.winningCount = winningCount;
     }
 
     public int getUid() {
@@ -107,5 +142,18 @@ public class Danmaku {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+
+    @Override
+    public int compareTo(@NonNull Danmaku o) {
+        if (o == null) {
+            return 0;
+        }
+        if (this.winningCount > o.winningCount) {
+            return -1;
+        } else {
+            return 1;
+        }
     }
 }

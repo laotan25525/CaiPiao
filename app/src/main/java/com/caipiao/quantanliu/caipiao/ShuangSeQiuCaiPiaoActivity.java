@@ -5,17 +5,20 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import com.caipiao.quantanliu.caipiao.bean.WinningHistory;
 import com.caipiao.quantanliu.caipiao.crawler.bean.Danmaku;
 import com.caipiao.quantanliu.caipiao.crawler.bean.DanmakuDao;
 import com.caipiao.quantanliu.caipiao.crawler.config.Config;
 import com.caipiao.quantanliu.caipiao.crawler.thread.CrawlerThread;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -27,7 +30,6 @@ import butterknife.OnClick;
 /**
  * Created by quantan.liu on 2018/1/27 0027 21:54.
  */
-
 public class ShuangSeQiuCaiPiaoActivity extends Activity {
 
     int handlerTime;
@@ -41,6 +43,8 @@ public class ShuangSeQiuCaiPiaoActivity extends Activity {
     private ArrayList<Integer> zhongjiangArrayList = new ArrayList();
     private ArrayList<Danmaku> currentDanmaKuList = new ArrayList();
     private ArrayList<Danmaku> zhongjJiangDanmaKuList = new ArrayList();
+    private ArrayList<WinningHistory> winningHistoryArrayList = new ArrayList();
+    List<Danmaku> winningUserlist = new ArrayList<>();//中奖个数最多的用户集合
 
     @BindView(R.id.tv_cai_piao_shuang_se_qiu_1)
     TextView tv_cai_piao_shuang_se_qiu_1;
@@ -58,7 +62,10 @@ public class ShuangSeQiuCaiPiaoActivity extends Activity {
     TextView tv_cai_piao_shuang_se_qiu_7;
     private DanmakuDao danmakuDao;
 
-    @OnClick({R.id.tv_cai_piao_shuang_se_qiu_1, R.id.tv_cai_piao_shuang_se_qiu_2, R.id.tv_cai_piao_shuang_se_qiu_3, R.id.tv_cai_piao_shuang_se_qiu_4, R.id.tv_cai_piao_shuang_se_qiu_5, R.id.tv_cai_piao_shuang_se_qiu_6, R.id.tv_cai_piao_shuang_se_qiu_7})
+    @OnClick({
+            R.id.tv_cai_piao_shuang_se_qiu_1, R.id.tv_cai_piao_shuang_se_qiu_2, R.id.tv_cai_piao_shuang_se_qiu_3,
+            R.id.tv_cai_piao_shuang_se_qiu_4, R.id.tv_cai_piao_shuang_se_qiu_5, R.id.tv_cai_piao_shuang_se_qiu_6,
+            R.id.tv_cai_piao_shuang_se_qiu_7})
     public void caiPiao(View view) {
         handlerTime = 0;
         switch (view.getId()) {
@@ -96,66 +103,93 @@ public class ShuangSeQiuCaiPiaoActivity extends Activity {
     public void zhuaDanMuStart(View view) {
         Zhibo.getInstance().currentDanmaKuList.clear();
         currentDanmaKuList.clear();
-        List<Danmaku> list = danmakuDao.queryBuilder().list();
-        System.out.println(list);
+//        List<Danmaku> list = danmakuDao.queryBuilder().list();
+//        System.out.println(list);
     }
+
     @OnClick(R.id.tv_zhuaDanMuEnd)
     public void zhuaDanMuEnd(View view) {
-        System.out.println("Zhibo.getInstance().currentDanmaKuList"+ Zhibo.getInstance().currentDanmaKuList);
+        System.out.println("Zhibo.getInstance().currentDanmaKuList" + Zhibo.getInstance().currentDanmaKuList);
         currentDanmaKuList.addAll(Zhibo.getInstance().currentDanmaKuList);
-        System.out.println("Zhibo.getInstance().currentDanmaKuListCaipiao"+ currentDanmaKuList);
+        System.out.println("Zhibo.getInstance().currentDanmaKuListCaipiao" + currentDanmaKuList);
     }
 
-        Handler handler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                handlerTime += 8;
-                switch (msg.what) {
-                    case 1:
-                        fristNum = getAnInt();
-                        zhongjianNumber(fristNum, tv_cai_piao_shuang_se_qiu_1, 1);
-                        break;
-                    case 2:
-                        secondNum = getAnInt();
-                        zhongjianNumber(secondNum, tv_cai_piao_shuang_se_qiu_2, 2);
-                        break;
-                    case 3:
-                        thirdNum = getAnInt();
-                        zhongjianNumber(thirdNum, tv_cai_piao_shuang_se_qiu_3, 3);
-                        break;
-                    case 4:
-                        fourthNum = getAnInt();
-                        zhongjianNumber(fourthNum, tv_cai_piao_shuang_se_qiu_4, 4);
-                        break;
-                    case 5:
-                        fifthNum = getAnInt();
-                        zhongjianNumber(fifthNum, tv_cai_piao_shuang_se_qiu_5, 5);
-                        break;
-                    case 6:
-                        sixthNum = getAnInt();
-                        zhongjianNumber(sixthNum, tv_cai_piao_shuang_se_qiu_6, 6);
-                        break;
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            handlerTime += 8;
+            switch (msg.what) {
+                case 1:
+                    fristNum = getAnInt();
+                    zhongjianNumber(fristNum, tv_cai_piao_shuang_se_qiu_1, 1);
+                    break;
+                case 2:
+                    secondNum = getAnInt();
+                    zhongjianNumber(secondNum, tv_cai_piao_shuang_se_qiu_2, 2);
+                    break;
+                case 3:
+                    thirdNum = getAnInt();
+                    zhongjianNumber(thirdNum, tv_cai_piao_shuang_se_qiu_3, 3);
+                    break;
+                case 4:
+                    fourthNum = getAnInt();
+                    zhongjianNumber(fourthNum, tv_cai_piao_shuang_se_qiu_4, 4);
+                    break;
+                case 5:
+                    fifthNum = getAnInt();
+                    zhongjianNumber(fifthNum, tv_cai_piao_shuang_se_qiu_5, 5);
+                    break;
+                case 6:
+                    sixthNum = getAnInt();
+                    zhongjianNumber(sixthNum, tv_cai_piao_shuang_se_qiu_6, 6);
+                    break;
 
-                    case 7:
-                        if (handlerTime >= 300) {
-                            tv_cai_piao_shuang_se_qiu_7.setText(getAnInt16() + "");
-                            handlerTime = 0;
-                        } else {
-                            tv_cai_piao_shuang_se_qiu_7.setText(getAnInt16() + "");
-                            handler.sendEmptyMessageDelayed(7, handlerTime);
-                        }
-                        break;
-                }
+                case 7:
+                    if (handlerTime >= 300) {
+                        seventhNum = getAnInt16();
+                        zhongjiangArrayList.add(seventhNum);
+                        tv_cai_piao_shuang_se_qiu_7.setText(seventhNum + "");
+                        handlerTime = 0;
+                        winningCount(7);
 
+
+                        WinningHistory winningHistory = new WinningHistory();
+                        winningHistory.setWinningUserlist(winningUserlist);
+                        winningHistory.setWinningNumberOne(fristNum);
+                        winningHistory.setWinningNumberTwo(secondNum);
+                        winningHistory.setWinningNumberThree(thirdNum);
+                        winningHistory.setWinningNumberFour(fourthNum);
+                        winningHistory.setWinningNumberFive(fifthNum);
+                        winningHistory.setWinningNumberSix(sixthNum);
+                        winningHistory.setWinningNumberBlue(seventhNum);
+                        winningHistory.setPhase(Zhibo.getInstance().shuangSeQiuPhase++);
+                        winningHistoryArrayList.add(winningHistory);
+//                       中奖号码，期数，人保存到数据库。
+                        App.getApp().getDaoSession().startAsyncSession().runInTx(new Runnable() {
+
+                            @Override
+                            public void run() {
+
+                            }
+                        });
+                    } else {
+                        tv_cai_piao_shuang_se_qiu_7.setText(getAnInt16() + "");
+                        handler.sendEmptyMessageDelayed(7, handlerTime);
+                    }
+                    break;
             }
-        };
+
+        }
+    };
 
     private void zhongjianNumber(int number, TextView textView, int what) {
         if (handlerTime >= 300 && !zhongjiangArrayList.contains(number)) {
             zhongjiangArrayList.add(number);
             textView.setText(number + "");
+            winningCount(0);
             handlerTime = 0;
+
         } else {
             textView.setText(number + "");
             handler.sendEmptyMessageDelayed(what, handlerTime);
@@ -163,13 +197,14 @@ public class ShuangSeQiuCaiPiaoActivity extends Activity {
     }
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(
+            @Nullable
+                    Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //无title
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         //全屏
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_shuang_se_qiu_cai_piao);
         ButterKnife.bind(this);
@@ -189,12 +224,40 @@ public class ShuangSeQiuCaiPiaoActivity extends Activity {
     }
 
     public void main() {
-        if (!Config.loadSuccess) return;
+        if (!Config.loadSuccess) {
+            return;
+        }
 
         Set<String> nameSet = Config.ROOM_MAP.keySet();
 
         for (String name : nameSet) {
             new Thread(new CrawlerThread(name, Config.ROOM_MAP.get(name)), "Crawler-" + name).start();
         }
+    }
+
+    public void winningCount(int currentNumber) {
+        for (Danmaku danmaku : currentDanmaKuList) {
+            String content = danmaku.getContent();
+            String substring = content.substring(content.indexOf("-") + 1, content.lastIndexOf("-"));
+            if (currentNumber != 7) {
+                if (substring.length() == 20) {
+                    for (Integer integer : zhongjiangArrayList) {
+                        if (substring.contains(integer > 9 ? String.valueOf(integer) : "0" + integer)) {
+                            danmaku.setWinningCount(danmaku.getWinningCount() + 1);
+                        }
+                    }
+                }
+            } else {
+                String substring1 = substring.substring(substring.lastIndexOf("-") + 1, substring.length());
+                if (Integer.valueOf(substring1) == seventhNum){
+                    danmaku.setWinningCount(danmaku.getWinningCount() + 1);
+                }
+            }
+            if (danmaku.getWinningCount() >= 1 && !winningUserlist.contains(danmaku)) {
+                winningUserlist.add(danmaku);
+            }
+        }
+        Collections.sort(winningUserlist);
+        Log.v("shuangseqiu", winningUserlist + "");
     }
 }
